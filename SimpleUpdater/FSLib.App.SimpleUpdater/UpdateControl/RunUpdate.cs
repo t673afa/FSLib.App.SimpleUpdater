@@ -45,7 +45,7 @@ namespace FSLib.App.SimpleUpdater.UpdateControl
 					var downloadedSize = ExtensionMethod.Sum(u.PackagesToUpdate, m => m.DownloadedSize);
 
 					SetProgress((int)downloadedSize, (int)totalSize);
-					StepDesc = string.Format(FSLib.App.SimpleUpdater.SR.DownloadProgress, count, downloaded, ExtensionMethod.ToSizeDescription(downloadedSize), ExtensionMethod.ToSizeDescription(totalSize));
+					StepDesc = string.Format(FSLib.App.SimpleUpdater.SR.DownloadProgress, downloaded, count,ExtensionMethod.ToSizeDescription(downloadedSize), ExtensionMethod.ToSizeDescription(totalSize));
 
 				};
 				u.PackageExtractionBegin += (s, e) =>
