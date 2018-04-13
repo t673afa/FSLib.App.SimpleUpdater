@@ -68,6 +68,28 @@ namespace FSLib.App.SimpleUpdater.Generator.BuilderInterface
 			bgw.RunWorkASync();
 		}
 
+		public virtual void Build(AuProject project)
+		{
+			var builder = UpdatePackageBuilder.Instance;
+
+			if (project == null)
+			{
+				BuilderFailed(null, new ApplicationException(SR.UnableOpenProject), null);
+				return;
+			}
+
+			builder.AuProject = project;
+
+			var bgw = new BackgroundWorker();
+			bgw.DoWork += (s, e) => builder.Build(e);
+			bgw.WorkFailed += (s, e) => BuilderFailed(project, e.Exception, builder.BuiltUpdateInfo);
+			bgw.WorkCompleted += (s, e) => BuildSuccess(project, builder.Result, builder.BuiltUpdateInfo);
+			bgw.WorkerProgressChanged += (s, e) => UpdateProgress(e.Progress);
+
+			OnWorkerInitialized();
+			bgw.RunWorkASync();
+		}
+
 		/// <summary>
 		/// 构建进度发生变化
 		/// </summary>

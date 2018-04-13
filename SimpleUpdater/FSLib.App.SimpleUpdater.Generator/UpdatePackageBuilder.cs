@@ -206,7 +206,8 @@ namespace FSLib.App.SimpleUpdater.Generator
 				return;
 
 			//自动取版本号
-			if (!string.IsNullOrEmpty(AuProject.VersionUpdateSrc))
+			var version = AuProject.UpdateInfo.AppVersion;
+			if (string.IsNullOrEmpty(version)&&!string.IsNullOrEmpty(AuProject.VersionUpdateSrc))
 			{
 				var path = AuProject.ParseFullPath(AuProject.VersionUpdateSrc);
 				if (File.Exists(path))
