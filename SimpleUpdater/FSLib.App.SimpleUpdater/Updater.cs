@@ -1024,8 +1024,31 @@ namespace FSLib.App.SimpleUpdater
 		{
 			//写入更新文件
 			var updateinfoFile = Context.UpdateInfoFilePath;
-			System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(updateinfoFile));
-			System.IO.File.WriteAllText(updateinfoFile, Context.UpdateInfoTextContent, System.Text.Encoding.UTF8);
+			//如果启动时有参数请保留参数
+			var fileName = Process.GetCurrentProcess().MainModule.ModuleName;
+			var args = Environment.GetCommandLineArgs();
+			if (args.Length > 0 && fileName.Equals(Context.UpdateInfo.FileExecuteAfter,StringComparison.CurrentCultureIgnoreCase))
+			{
+				var updateInfo = XMLSerializeHelper.XmlDeserializeFromString<UpdateInfo>(Context.UpdateInfoTextContent);
+				var arguments = "";
+				foreach (string arg in args)
+				{
+					arguments += " " + arg;
+				}
+				arguments = arguments.Trim();
+
+				if (!string.IsNullOrEmpty(updateInfo.ExecuteArgumentAfter))
+				{
+					arguments += " " + updateInfo.ExecuteArgumentAfter;
+				}
+				updateInfo.ExecuteArgumentAfter = arguments;
+				XMLSerializeHelper.XmlSerilizeToFile(updateInfo, updateinfoFile);
+			}
+			else
+			{
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(updateinfoFile));
+				System.IO.File.WriteAllText(updateinfoFile, Context.UpdateInfoTextContent, System.Text.Encoding.UTF8);
+			}
 			//写入包列表
 			XMLSerializeHelper.XmlSerilizeToFile(PackagesToUpdate, Context.UpdatePackageListPath);
 			XMLSerializeHelper.XmlSerilizeToFile(ExtensionMethod.ToList(FileInstaller.PreservedFiles.Keys), Context.PreserveFileListPath);
@@ -1349,4 +1372,5 @@ namespace FSLib.App.SimpleUpdater
 
 		#endregion
 	}
+
 }
